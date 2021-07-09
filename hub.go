@@ -3,9 +3,13 @@ package main
 import "encoding/json"
 
 var h = hub{
+	//connections注册了连接器
 	c: make(map[*connection]bool),
+	//unregister销毁请求
 	u: make(chan *connection),
+	//broadcast从连接器发送的信息
 	b: make(chan []byte),
+	//register从连接器注册请求
 	r: make(chan *connection),
 }
 

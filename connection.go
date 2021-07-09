@@ -53,7 +53,7 @@ func (c *connection) writer() {
 
 var user_list = []string{}
 
-//读取客户端连接发送的数据
+//读取客户端连接ws发送的数据
 func (c *connection) reader() {
 	for {
 		_, message, err := c.ws.ReadMessage()
@@ -86,6 +86,7 @@ func (c *connection) reader() {
 	}
 }
 
+//删除用户切片中数据
 func del(slice []string, user string) []string {
 	count := len(slice)
 	if count == 0 {
