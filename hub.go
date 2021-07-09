@@ -29,7 +29,7 @@ func (h *hub) run() {
 			c.data.Type = "handshake"
 			c.data.UserList = user_list
 			data_b, _ := json.Marshal(c.data)
-			c.sc <- data_b
+			c.sc <- data_b	//向sc chan写数据到客户端
 		case c := <-h.u:
 			if _, ok := h.c[c]; ok {
 				delete(h.c, c)

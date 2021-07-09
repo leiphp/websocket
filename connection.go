@@ -1,9 +1,12 @@
 package main
 
 import (
+	."chatroom/infra/database"
+	"chatroom/pkg/nats"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
+	"log"
 	"net/http"
 )
 
@@ -29,7 +32,7 @@ func myws(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	c := &connection{sc: make(chan []byte, 256), ws: ws, data: &Data{}}
-	h.r <- c
+	h.r <- c //向register连接器注册请求
 	go c.writer()
 	c.reader()
 	defer func() {
@@ -46,6 +49,9 @@ func myws(w http.ResponseWriter, r *http.Request) {
 //哪个client需要写入哪个client就调用
 func (c *connection) writer() {
 	for message := range c.sc {
+		m := make(map[string]interface{})
+		json.Unmarshal(message, &m)
+		log.Println("writer message:",m)
 		c.ws.WriteMessage(websocket.TextMessage, message)
 	}
 	c.ws.Close()
@@ -56,12 +62,19 @@ var user_list = []string{}
 //读取客户端连接ws发送的数据
 func (c *connection) reader() {
 	for {
+		m := make(map[string]interface{})
 		_, message, err := c.ws.ReadMessage()
+		json.Unmarshal(message, &m)
+		log.Println("reader message:",m)
+
 		if err != nil {
 			h.r <- c
 			break
 		}
 		json.Unmarshal(message, &c.data)
+		log.Println("reader data:",c.data)
+		//读到消息通过nats推送到ui界面
+		go nats.NotifyTakeout(c.data)
 		switch c.data.Type {
 		case "login":
 			c.data.User = c.data.Content
