@@ -23,6 +23,7 @@ var wu = &websocket.Upgrader{
 }
 
 func myws(w http.ResponseWriter, r *http.Request) {
+	// 将初始GET请求升级到websocket
 	ws, err := wu.Upgrade(w, r, nil)
 	if err != nil {
 		return
@@ -42,6 +43,7 @@ func myws(w http.ResponseWriter, r *http.Request) {
 	}()
 }
 
+//哪个client需要写入哪个client就调用
 func (c *connection) writer() {
 	for message := range c.sc {
 		c.ws.WriteMessage(websocket.TextMessage, message)
@@ -51,6 +53,7 @@ func (c *connection) writer() {
 
 var user_list = []string{}
 
+//读取客户端连接发送的数据
 func (c *connection) reader() {
 	for {
 		_, message, err := c.ws.ReadMessage()

@@ -3,6 +3,6 @@ websocket chatroom project
 
 ## 运行
 ```go
-go run server.go hub.go data.go connection.go
+go run server.go 
 ```
-运行之后执行local.html文件  
+运行之后点击执行local.html文件  
